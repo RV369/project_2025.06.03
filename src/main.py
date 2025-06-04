@@ -73,7 +73,7 @@ async def get_post_find_content(
         'content_str': data.content,
         'count': count_content,
     }
-    await Repozitory.create(CountContent, **kwargs)
+    await Repozitory.update_or_create(CountContent, **kwargs)
     if posts:
         return [
             PostSchema(id=t.id, category=t.category, content=t.content)
