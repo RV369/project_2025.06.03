@@ -75,16 +75,12 @@ class Repozitory:
             instance = rez.scalars().first()
             if instance:
                 instance.count = kwargs['count']
-                session.add(instance)
-                await session.flush()
-                await session.commit()
-                return instance
             else:
                 instance = model(**kwargs)
-                session.add(instance)
-                await session.flush()
-                await session.commit()
-                return instance
+            session.add(instance)
+            await session.flush()
+            await session.commit()
+            return instance
 
     @classmethod
     async def create_tables(self):
