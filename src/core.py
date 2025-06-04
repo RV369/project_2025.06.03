@@ -1,6 +1,6 @@
 from collections import Counter
 
 
-def count_str(str, item):
-    m = Counter([i.content for i in item])
-    return m[str]
+def count_str(string: str, item: list) -> int:
+    """Подсчитывает частоту слов"""
+    return Counter([i.content for i in item])[string]
