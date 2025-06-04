@@ -55,7 +55,6 @@ class Repozitory:
                 select(model).filter(model.content.ilike(search)),
             )
             instance = rez.scalars().all()
-
             return instance
 
     @classmethod
