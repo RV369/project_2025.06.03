@@ -67,7 +67,7 @@ class Repozitory:
             return instance
 
     @classmethod
-    async def update_or_create(cls, model, **kwargs):
+    async def update_or_create(self, model, **kwargs):
         async with SessionLocal() as session:
             rez = await session.execute(
                 select(model).filter_by(content_str=kwargs['content_str']),
