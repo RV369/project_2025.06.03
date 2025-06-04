@@ -68,7 +68,7 @@ async def get_post_find_content(
         'content': data.content,
     }
     posts = await Repozitory.get_posts_content(Post, **kwargs)
-    count_content = count_str(data.content, posts)
+    count_content = await count_str(data.content, posts)
     kwargs = {
         'content_str': data.content,
         'count': count_content,
