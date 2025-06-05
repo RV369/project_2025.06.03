@@ -1,0 +1,11 @@
+# src/.dockerignore
+venv
+.git
+db.sqlite3
+db.sqlite3.bak
+.idea
+.vscode
+.env
+bot.db
+/db
+db.sqlite3

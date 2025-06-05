@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  web:
+    image: rv369/project_2025.06.03-web:latest
+    command: uvicorn src.main:app --host 0.0.0.0 --reload
+    volumes:
+      - db:/app/db
+    ports:
+      - "8000:8000"
+    restart: always
+
+volumes:
+  db:
+  
