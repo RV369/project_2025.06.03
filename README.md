@@ -25,3 +25,9 @@ uvicorn src.main:app --host 0.0.0.0 --port 8000
 - <http://127.0.0.1:8000/docs>
 
 - <http://127.0.0.1:8000/redoc>
+
+## Для запуска докер-контейнера нужно скопировать файл docker-compose.production.yml и запустить
+
+```sh
+docker compose -f docker-compose.production.yml up
+```

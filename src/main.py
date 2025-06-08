@@ -1,12 +1,16 @@
-import uuid
+from fastapi import Depends, FastAPI, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-
-
-from src.db import Repozitory
-from src.db import Post, CountContent
 from src.core import count_str
+from src.db import Repozitory, get_session_local
+from src.models import CountContent, Post, Tag
+from src.schemas import (
+    FindCategorySchema,
+    FindContentSchema,
+    PostCreateSchema,
+    PostSchema,
+)
 
 
 async def lifespan(app):
@@ -15,25 +19,6 @@ async def lifespan(app):
 
 
 app = FastAPI(lifespan=lifespan)
-
-
-class PostSchema(BaseModel):
-    id: uuid.UUID
-    category: str
-    content: str
-
-
-class FindCategorySchema(BaseModel):
-    category: str
-
-
-class FindContentSchema(BaseModel):
-    content: str
-
-
-class PostCreateSchema(BaseModel):
-    category: str
-    content: str
 
 
 @app.post('/find_category/', response_model=list[PostSchema])
@@ -47,10 +32,7 @@ async def get_post_find_category(
     }
     posts = await Repozitory.get_category(Post, **kwargs)
     if posts:
-        return [
-            PostSchema(id=t.id, category=t.category, content=t.content)
-            for t in posts
-        ][skip: skip + limit]
+        return [p for p in posts][skip: skip + limit]
     else:
         raise HTTPException(
             status_code=404,
@@ -75,10 +57,7 @@ async def get_post_find_content(
     }
     await Repozitory.update_or_create(CountContent, **kwargs)
     if posts:
-        return [
-            PostSchema(id=t.id, category=t.category, content=t.content)
-            for t in posts
-        ][skip: skip + limit]
+        return [p for p in posts][skip: skip + limit]
     else:
         raise HTTPException(
             status_code=404,
@@ -89,7 +68,20 @@ async def get_post_find_content(
 @app.post('/create/', response_model=PostSchema)
 async def post_create(
     data: PostCreateSchema,
+    session: AsyncSession = Depends(get_session_local),
 ):
-    kwargs = {'category': data.category, 'content': data.content}
-    post = await Repozitory.create(Post, **kwargs)
+    kwargs = {'category': data.category, 'content': data.content, 'tags': []}
+    for tag in data.tags:
+        rez = await session.execute(select(Tag).filter_by(name=tag))
+        instance = rez.scalars().first()
+        if instance:
+            kwargs['tags'].append(instance)
+        else:
+            instance = Tag(name=tag)
+            kwargs['tags'].append(instance)
+        session.add(instance)
+    post = Post(**kwargs)
+    session.add(post)
+    await session.flush()
+    await session.commit()
     return post
