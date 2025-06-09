@@ -74,11 +74,9 @@ async def post_create(
     for tag in data.tags:
         rez = await session.execute(select(Tag).filter_by(name=tag))
         instance = rez.scalars().first()
-        if instance:
-            kwargs['tags'].append(instance)
-        else:
+        if not instance:
             instance = Tag(name=tag)
-            kwargs['tags'].append(instance)
+        kwargs['tags'].append(instance)
         session.add(instance)
     post = Post(**kwargs)
     session.add(post)

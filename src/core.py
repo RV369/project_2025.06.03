@@ -1,6 +1,6 @@
-async def count_str(string: str, item: list) -> int:
+async def count_str(string: str, items: list) -> int:
     """Подсчитывает частоту слов"""
     m = 0
-    for post in item:
+    for post in items:
         m += post.content.count(string)
     return m
